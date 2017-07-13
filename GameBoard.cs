@@ -10,6 +10,7 @@ namespace BattleshipBot
 {
     class GameBoard
     {
+        public static string GridRefs = "ABCDEFGHIJ";
         private bool[,] grid;
 
         Random rng = new Random();
@@ -76,7 +77,7 @@ namespace BattleshipBot
 
         private bool CanShipFitVertical(int x, int y, Ship ship)
         {
-            for (int j = y; j <= y + ship.GetSize(); j++)
+            for (int j = y; j < y + ship.GetSize(); j++)
             {
                 if (grid[x, j])
                 {
@@ -88,7 +89,7 @@ namespace BattleshipBot
 
         private bool CanShipFitHorizontal(int x, int y, Ship ship)
         {
-            for (int i = x; i <= x + ship.GetSize(); i++)
+            for (int i = x; i < x + ship.GetSize(); i++)
             {
                 if (grid[i, y])
                 {
@@ -144,8 +145,10 @@ namespace BattleshipBot
         {
             StringBuilder gridString = new StringBuilder();
 
+            gridString.Append("[ ][1][2][3][4][5][6][7][8][9][0]\n");
             for (int j = 0; j < 10; j++)
             {
+                gridString.Append("[" + GridRefs.ToCharArray()[j] + "]");
                 for (int i = 0; i < 10; i++)
                 {
                     gridString.Append("[" + (grid[i,j] ? 'X' : ' ') + "]");

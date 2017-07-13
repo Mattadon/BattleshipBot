@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BattleshipBot.Ships;
 using Battleships.Player.Interface;
 
@@ -14,26 +15,27 @@ namespace BattleshipBot
         {
             lastTarget = null; // Forget all our history when we start a new game
         
-            Carrier monCalCarrier = new Carrier();
-            Battleship monCalCCruiser = new Battleship();
-            Destroyer starDestroyer = new Destroyer();
-            Frigate hammerHeadFrigate = new Frigate();
-            PatrolBoat corellianCorvette = new PatrolBoat();
+            List<Ship> allianceFleet = new List<Ship>();
+            allianceFleet.Add(new Carrier());
+            allianceFleet.Add(new Battleship());
+            allianceFleet.Add(new Destroyer());
+            allianceFleet.Add(new Frigate());
+            allianceFleet.Add(new PatrolBoat());
 
-            board.AddShipToRandomPosition(monCalCarrier);
-            board.AddShipToRandomPosition(monCalCCruiser);
-            board.AddShipToRandomPosition(starDestroyer);
-            board.AddShipToRandomPosition(hammerHeadFrigate);
-            board.AddShipToRandomPosition(corellianCorvette);
-
-            return new List<IShipPosition>
+            foreach (Ship ship in allianceFleet)
             {
-                monCalCarrier.GetPosition(),
-                monCalCCruiser.GetPosition(),
-                starDestroyer.GetPosition(),
-                hammerHeadFrigate.GetPosition(),
-                corellianCorvette.GetPosition()
-            };
+                board.AddShipToRandomPosition(ship);
+            }
+
+            List<IShipPosition> shipPositions = new List<IShipPosition>();
+
+            foreach (Ship ship in allianceFleet)
+            {
+                shipPositions.Add(ship.GetPosition());
+                Console.WriteLine(ship);
+            }
+
+            return shipPositions;
         }
 
         public string DrawBoard()
