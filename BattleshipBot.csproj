@@ -43,8 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyBot.cs" />
+    <Compile Include="AdmiralAckbot.cs" />
+    <Compile Include="GameBoard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ships\Battleship.cs" />
+    <Compile Include="Ships\Carrier.cs" />
+    <Compile Include="Ships\Destroyer.cs" />
+    <Compile Include="Ships\Frigate.cs" />
+    <Compile Include="Ships\PatrolBoat.cs" />
+    <Compile Include="Ships\Ship.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
