@@ -97,19 +97,39 @@ namespace BattleshipBot
             int row = rng.Next(10);
             int column = rng.Next(5) * 2;
 
-            int firstColumnInRow = column;
-
             if (row % 2 == 0)
                 column++;
+
+            int firstX = column;
+            int firstY = row;
+
+            int firstColumnInRow = column;
+
+            Console.WriteLine("Initial attempt at (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
 
             while (enemyBoard.IsTestedSquare(column, row))
             {
                 column = (column + 2) % 10;
+
+                Console.WriteLine("Shifting to tile (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
+
                 if (column == firstColumnInRow)
                 {
                     row = (row + 1) % 10;
                     column = (column + 1) % 10;
                     firstColumnInRow = column;
+
+                    Console.WriteLine("Shifting down to tile (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
+                }
+
+                //Complete loop, therefore shift to other coloured tiles
+                //This will eventually be redundant, as matches will end before all options explored
+                //But in the half-finished state, we need to avoid infinite loops
+                if (column == firstX && row == firstY)
+                {
+                    column = (column + 1) % 10;
+
+                    Console.WriteLine("Shifting to next colour tile (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
                 }
             }
 
