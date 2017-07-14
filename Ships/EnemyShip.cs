@@ -94,11 +94,15 @@ namespace BattleshipBot.Ships
 
             if (!wasHit)
             {
-                possibleTilesAroundSeed.RemoveAll(point => ShouldRemovePoint(point, shotPoint));
+                possibleTilesAroundSeed.RemoveAll(point => ShouldRemovePointsBeyondMiss(point, shotPoint));
+            }
+            else
+            {
+                possibleTilesAroundSeed.RemoveAll(point => ShouldRemovePointsNoInShipDirection(point, shotPoint));
             }
         }
 
-        private bool ShouldRemovePoint(Point testPoint, Point missPoint)
+        private bool ShouldRemovePointsBeyondMiss(Point testPoint, Point missPoint)
         {
             Console.Write("Removing points:");
             //Remove point if beyond the miss point
@@ -130,6 +134,18 @@ namespace BattleshipBot.Ships
             Console.WriteLine();
 
             return false;
+        }
+
+        private bool ShouldRemovePointsNoInShipDirection(Point testPoint, Point hitPoint)
+        {
+            if (hitPoint.X == seed.X) //Then ship is vertical
+            {
+                return testPoint.X != seed.X;
+            }
+            else
+            {
+                return testPoint.Y != seed.Y;
+            }
         }
     }
 }
