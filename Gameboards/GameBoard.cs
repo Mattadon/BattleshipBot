@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BattleshipBot.Ships;
 
-namespace BattleshipBot
+namespace BattleshipBot.Gameboards
 {
     class GameBoard
     {
@@ -48,10 +44,6 @@ namespace BattleshipBot
                 UpdateGrid(testX, testY, ship);
                 return true;
             }
-            else
-            {
-                Console.WriteLine("Cannae Do it Cap'n");
-            }
 
             return false;
         }
@@ -66,10 +58,6 @@ namespace BattleshipBot
                 PlaceShip(testX, testY, ship, Orientation.Horizontal);
                 UpdateGrid(testX, testY, ship);
                 return true;
-            }
-            else
-            {
-                Console.WriteLine("Cannae Do it Cap'n");
             }
 
             return false;
@@ -112,7 +100,7 @@ namespace BattleshipBot
                 {
                     for (int j = y - 1; j <= y + 1; j++)
                     {
-                        if (PointOnGrid(i, j))
+                        if (IsPointOnGrid(i, j))
                         {
                             grid[i, j] = true;
                         }
@@ -125,7 +113,7 @@ namespace BattleshipBot
                 {
                     for (int i = x - 1; i <= x + 1; i++)
                     {
-                        if (PointOnGrid(i, j))
+                        if (IsPointOnGrid(i, j))
                         {
                             grid[i, j] = true;
                         }
@@ -134,7 +122,7 @@ namespace BattleshipBot
             }
         }
 
-        private bool PointOnGrid(int x, int y)
+        protected bool IsPointOnGrid(int x, int y)
         {
             bool xInGrid = x >= 0 && x < 10;
             bool yInGrid = y >= 0 && y < 10;
@@ -151,7 +139,7 @@ namespace BattleshipBot
                 gridString.Append("[" + GridRefs.ToCharArray()[j] + "]");
                 for (int i = 0; i < 10; i++)
                 {
-                    gridString.Append("[" + (grid[i,j] ? 'X' : ' ') + "]");
+                    gridString.Append("[" + (grid[i, j] ? 'X' : ' ') + "]");
                 }
                 gridString.Append("\n");
             }

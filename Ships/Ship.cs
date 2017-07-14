@@ -1,4 +1,5 @@
 ﻿using System.Xml.Serialization;
+using BattleshipBot.Gameboards;
 using Battleships.Player.Interface;
 
 namespace BattleshipBot.Ships

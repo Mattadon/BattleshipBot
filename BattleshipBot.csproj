@@ -44,7 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdmiralAckbot.cs" />
-    <Compile Include="GameBoard.cs" />
+    <Compile Include="Gameboards\EnemyBoard.cs" />
+    <Compile Include="Gameboards\GameBoard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ships\Battleship.cs" />
     <Compile Include="Ships\Carrier.cs" />

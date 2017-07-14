@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BattleshipBot.Gameboards;
 using BattleshipBot.Ships;
 using Battleships.Player.Interface;
 
@@ -9,7 +10,17 @@ namespace BattleshipBot
     {
         private IGridSquare lastTarget;
 
-        GameBoard board = new GameBoard();
+        private GameBoard ourBoard;
+        private EnemyBoard enemyBoard;
+
+        private Random rng;
+
+        public AdmiralAckbot()
+        {
+            ourBoard = new GameBoard();
+            enemyBoard = new EnemyBoard();
+            rng = new Random();
+        }
 
         public IEnumerable<IShipPosition> GetShipPositions()
         {
@@ -24,7 +35,7 @@ namespace BattleshipBot
 
             foreach (Ship ship in allianceFleet)
             {
-                board.AddShipToRandomPosition(ship);
+                ourBoard.AddShipToRandomPosition(ship);
             }
 
             List<IShipPosition> shipPositions = new List<IShipPosition>();
@@ -32,7 +43,6 @@ namespace BattleshipBot
             foreach (Ship ship in allianceFleet)
             {
                 shipPositions.Add(ship.GetPosition());
-                Console.WriteLine(ship);
             }
 
             return shipPositions;
@@ -40,12 +50,7 @@ namespace BattleshipBot
 
         public string DrawBoard()
         {
-            return board.ToString();
-        }
-
-        private static ShipPosition GetShipPosition(char startRow, int startColumn, char endRow, int endColumn)
-        {
-            return new ShipPosition(new GridSquare(startRow, startColumn), new GridSquare(endRow, endColumn));
+            return enemyBoard.ToString();
         }
 
         public IGridSquare SelectTarget()
@@ -57,6 +62,8 @@ namespace BattleshipBot
 
         private IGridSquare GetNextTarget()
         {
+            return PickRandomTarget();
+            /*
             if (lastTarget == null)
             {
                 return new GridSquare('A', 1);
@@ -76,7 +83,44 @@ namespace BattleshipBot
             }
             col = 1;
             return new GridSquare(row, col);
+            */
         }
+
+        /*
+         * We can cover the whole board by only aiming at half of the squares
+         * (In a chess-board pattern)
+         * Pick even columns in rows A, C, E...
+         * Pick odd columns in rows B, D, F...
+         */
+        private IGridSquare PickRandomTarget()
+        {
+            int row = rng.Next(10);
+            int column = rng.Next(5) * 2;
+
+            int firstColumnInRow = column;
+
+            if (row % 2 == 0)
+                column++;
+
+            while (enemyBoard.IsTestedSquare(column, row))
+            {
+                column = (column + 2) % 10;
+                if (column == firstColumnInRow)
+                {
+                    row = (row + 1) % 10;
+                    column = (column + 1) % 10;
+                    firstColumnInRow = column;
+                }
+            }
+
+            IGridSquare gridSquare = new GridSquare(GameBoard.GridRefs.ToCharArray()[row], column + 1);
+            
+            //TODO: Remove before submitting!
+            enemyBoard.UpdateBoard(gridSquare, false);
+
+            return gridSquare;
+        }
+
 
         public void HandleShotResult(IGridSquare square, bool wasHit)
         {
