@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Text;
 using BattleshipBot.Ships;
+using Battleships.Player.Interface;
 
 namespace BattleshipBot.Gameboards
 {
-    class GameBoard
+    public class GameBoard
     {
         public static string GridRefs = "ABCDEFGHIJ";
         private bool[,] grid;
@@ -14,6 +15,11 @@ namespace BattleshipBot.Gameboards
         public GameBoard()
         {
             grid = new bool[10, 10];
+        }
+
+        public GameBoard(bool[,] board)
+        {
+            grid = board;
         }
 
         public void AddShipToRandomPosition(Ship ship)
@@ -35,13 +41,12 @@ namespace BattleshipBot.Gameboards
 
         private bool TryAddShipVertical(Ship ship)
         {
-            int testX = rng.Next(10);
-            int testY = rng.Next(10 - ship.GetSize());
+            Point test = new Point(rng.Next(10), rng.Next(10 - ship.GetSize()));
 
-            if (CanShipFitVertical(testX, testY, ship))
+            if (CanShipFitVertical(test, ship))
             {
-                PlaceShip(testX, testY, ship, Orientation.Vertical);
-                UpdateGrid(testX, testY, ship);
+                PlaceShip(test, ship, Orientation.Vertical);
+                UpdateGrid(test, ship);
                 return true;
             }
 
@@ -50,24 +55,23 @@ namespace BattleshipBot.Gameboards
 
         private bool TryAddShipHorizontal(Ship ship)
         {
-            int testX = rng.Next(10 - ship.GetSize());
-            int testY = rng.Next(10);
+            Point test = new Point(rng.Next(10 - ship.GetSize()), rng.Next(10));
 
-            if (CanShipFitHorizontal(testX, testY, ship))
+            if (CanShipFitHorizontal(test, ship))
             {
-                PlaceShip(testX, testY, ship, Orientation.Horizontal);
-                UpdateGrid(testX, testY, ship);
+                PlaceShip(test, ship, Orientation.Horizontal);
+                UpdateGrid(test, ship);
                 return true;
             }
 
             return false;
         }
 
-        private bool CanShipFitVertical(int x, int y, Ship ship)
+        private bool CanShipFitVertical(Point head, Ship ship)
         {
-            for (int j = y; j < y + ship.GetSize(); j++)
+            for (int j = head.Y; j < head.Y + ship.GetSize(); j++)
             {
-                if (grid[x, j])
+                if (grid[head.X, j])
                 {
                     return false;
                 }
@@ -75,11 +79,11 @@ namespace BattleshipBot.Gameboards
             return true;
         }
 
-        private bool CanShipFitHorizontal(int x, int y, Ship ship)
+        private bool CanShipFitHorizontal(Point head, Ship ship)
         {
-            for (int i = x; i < x + ship.GetSize(); i++)
+            for (int i = head.X; i < head.X + ship.GetSize(); i++)
             {
-                if (grid[i, y])
+                if (grid[i, head.Y])
                 {
                     return false;
                 }
@@ -87,20 +91,20 @@ namespace BattleshipBot.Gameboards
             return true;
         }
 
-        private void PlaceShip(int x, int y, Ship ship, Orientation orientation)
+        private void PlaceShip(Point head, Ship ship, Orientation orientation)
         {
-            ship.SetPosition(x, y, orientation);
+            ship.SetPosition(head, orientation);
         }
 
-        private void UpdateGrid(int x, int y, Ship ship)
+        private void UpdateGrid(Point head, Ship ship)
         {
             if (ship.GetOrientation() == Orientation.Horizontal)
             {
-                for (int i = x - 1; i <= x + ship.GetSize(); i++)
+                for (int i = head.X - 1; i <= head.X + ship.GetSize(); i++)
                 {
-                    for (int j = y - 1; j <= y + 1; j++)
+                    for (int j = head.Y - 1; j <= head.Y + 1; j++)
                     {
-                        if (IsPointOnGrid(i, j))
+                        if (IsPointOnGrid(new Point(i , j)))
                         {
                             grid[i, j] = true;
                         }
@@ -109,11 +113,11 @@ namespace BattleshipBot.Gameboards
             }
             else
             {
-                for (int j = y - 1; j <= y + ship.GetSize(); j++)
+                for (int j = head.Y - 1; j <= head.Y + ship.GetSize(); j++)
                 {
-                    for (int i = x - 1; i <= x + 1; i++)
+                    for (int i = head.X - 1; i <= head.X + 1; i++)
                     {
-                        if (IsPointOnGrid(i, j))
+                        if (IsPointOnGrid(new Point(i, j)))
                         {
                             grid[i, j] = true;
                         }
@@ -122,11 +126,18 @@ namespace BattleshipBot.Gameboards
             }
         }
 
-        protected bool IsPointOnGrid(int x, int y)
+        protected bool IsPointOnGrid(Point p)
         {
-            bool xInGrid = x >= 0 && x < 10;
-            bool yInGrid = y >= 0 && y < 10;
+            bool xInGrid = p.X >= 0 && p.X < 10;
+            bool yInGrid = p.Y >= 0 && p.Y < 10;
             return xInGrid && yInGrid;
+        }
+
+        public bool TargetIsShip(IGridSquare square)
+        {
+            Point target = Utils.ConvertGridSquareToPoint(square);
+
+            return grid[target.X, target.Y];
         }
 
         public override string ToString()

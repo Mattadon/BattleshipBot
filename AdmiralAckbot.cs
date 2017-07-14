@@ -6,17 +6,29 @@ using Battleships.Player.Interface;
 
 namespace BattleshipBot
 {
+    public enum BotStates
+    {
+        Searching,
+        Attacking
+    }
+
     public class AdmiralAckbot : IBattleshipsBot
     {
         private IGridSquare lastTarget;
 
+        private BotStates state;
+
         private GameBoard ourBoard;
         private EnemyBoard enemyBoard;
+
+        //The first hit on the previous ship attacked
+        private EnemyShip previousShipAttacked;
 
         private Random rng;
 
         public AdmiralAckbot()
         {
+            state = BotStates.Searching;
             ourBoard = new GameBoard();
             enemyBoard = new EnemyBoard();
             rng = new Random();
@@ -53,6 +65,11 @@ namespace BattleshipBot
             return enemyBoard.ToString();
         }
 
+        public GameBoard GetBoard()
+        {
+            return ourBoard;
+        }
+
         public IGridSquare SelectTarget()
         {
             var nextTarget = GetNextTarget();
@@ -62,28 +79,14 @@ namespace BattleshipBot
 
         private IGridSquare GetNextTarget()
         {
-            return PickRandomTarget();
-            /*
-            if (lastTarget == null)
+            if (state == BotStates.Searching)
             {
-                return new GridSquare('A', 1);
+                return PickRandomTarget();
             }
-
-            var row = lastTarget.Row;
-            var col = lastTarget.Column + 1;
-            if (lastTarget.Column != 10)
+            else
             {
-                return new GridSquare(row, col);
+                return AttackShip();
             }
-
-            row = (char)(row + 1);
-            if (row > 'J')
-            {
-                row = 'A';
-            }
-            col = 1;
-            return new GridSquare(row, col);
-            */
         }
 
         /*
@@ -105,21 +108,15 @@ namespace BattleshipBot
 
             int firstColumnInRow = column;
 
-            Console.WriteLine("Initial attempt at (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
-
             while (enemyBoard.IsTestedSquare(column, row))
             {
                 column = (column + 2) % 10;
-
-                Console.WriteLine("Shifting to tile (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
 
                 if (column == firstColumnInRow)
                 {
                     row = (row + 1) % 10;
                     column = (column + 1) % 10;
                     firstColumnInRow = column;
-
-                    Console.WriteLine("Shifting down to tile (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
                 }
 
                 //Complete loop, therefore shift to other coloured tiles
@@ -128,23 +125,43 @@ namespace BattleshipBot
                 if (column == firstX && row == firstY)
                 {
                     column = (column + 1) % 10;
-
-                    Console.WriteLine("Shifting to next colour tile (" + (column + 1) + ", " + GameBoard.GridRefs.ToCharArray()[row] + ")");
                 }
             }
 
             IGridSquare gridSquare = new GridSquare(GameBoard.GridRefs.ToCharArray()[row], column + 1);
-            
-            //TODO: Remove before submitting!
-            enemyBoard.UpdateBoard(gridSquare, false);
 
             return gridSquare;
+        }
+
+        private IGridSquare AttackShip()
+        {
+            if (previousShipAttacked.HasUnexploredPointsAroundSeed())
+            {
+                return previousShipAttacked.GetNextTarget();
+            }
+            else
+            {
+                state = BotStates.Searching;
+                return PickRandomTarget();
+            }
         }
 
 
         public void HandleShotResult(IGridSquare square, bool wasHit)
         {
-            // Ignore whether we're successful
+            if (state == BotStates.Searching && wasHit)
+            {
+                state = BotStates.Attacking;
+                previousShipAttacked = new EnemyShip(square);
+
+                Console.WriteLine("FOUND A SHIP");
+            }
+            else if (state == BotStates.Attacking)
+            {
+                previousShipAttacked.UpdateBasedOnShotResult(square, wasHit);    
+            }
+
+            enemyBoard.UpdateBoard(square, wasHit);
         }
 
         public void HandleOpponentsShot(IGridSquare square)

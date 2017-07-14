@@ -7,15 +7,15 @@ namespace BattleshipBot.Ships
     public enum Orientation
     {
         Horizontal,
-        Vertical
+        Vertical,
+        Unknown
     }
 
-    abstract  class Ship
+    abstract public class Ship
     {
         private readonly int size;
 
-        private int headX;
-        private int headY;
+        private Point head;
         private Orientation orientation;
 
         protected Ship(int shipSize)
@@ -23,24 +23,22 @@ namespace BattleshipBot.Ships
             size = shipSize;
         }
 
-        public void SetPosition(int x, int y, Orientation shipOrientation)
+        public void SetPosition(Point point, Orientation shipOrientation)
         {
-            headX = x;
-            headY = y;
+            head = point;
             orientation = shipOrientation;
         }
 
         public ShipPosition GetPosition()
         {
-            int endX = headX;
-            int endY = headY;
+            Point end = new Point(head);
 
             if (orientation == Orientation.Horizontal)
-                endX = headX + size - 1;
+                end.X = head.X + size - 1;
             else
-                endY = headY + size - 1;
+                end.Y = head.Y + size - 1;
 
-            ShipPosition pos = new ShipPosition(new GridSquare(ConvertPosToChar(headY), headX + 1), new GridSquare(ConvertPosToChar(endY), endX + 1));
+            ShipPosition pos = new ShipPosition(Utils.ConvertPointToGridSquare(head), Utils.ConvertPointToGridSquare(end));
             return pos;
         }
 
@@ -61,15 +59,14 @@ namespace BattleshipBot.Ships
 
         public override string ToString()
         {
-            int endX = headX;
-            int endY = headY;
+            Point end = new Point(head);
 
             if (orientation == Orientation.Horizontal)
-                endX = headX + size - 1;
+                end.X = head.X + size - 1;
             else
-                endY = headY + size - 1;
+                end.Y = head.Y + size - 1;
 
-            return "SHIP SIZE: " + size + " AT (" + (headX + 1) + "," + ConvertPosToChar(headY) + ") TO (" + (endX + 1) + "," + ConvertPosToChar(endY) + ")";
+            return "SHIP SIZE: " + size + " AT (" + (head.X + 1) + "," + ConvertPosToChar(head.Y) + ") TO (" + (end.X + 1) + "," + ConvertPosToChar(end.Y) + ")";
         }
     }
 }
