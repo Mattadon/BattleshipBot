@@ -23,27 +23,44 @@ namespace BattleshipBot.Ships
          */
         private readonly List<Point> possibleTilesAroundSeed;
 
-        public EnemyShip(IGridSquare seedSquare)
+        public EnemyShip(IGridSquare seedSquare, EnemyBoard enemyBoard)
         {
             seed = Utils.ConvertGridSquareToPoint(seedSquare);
+
+            bool addDown = true;
+            bool addRight = true;
+            bool addUp = true;
+            bool addLeft = true;
 
             possibleTilesAroundSeed = new List<Point>();
             for(int dist = 1; dist <= 4; dist++)
             {
                 Point down = seed.Plus(new Point(0, dist));
-                if(IsPointOnGrid(down))
+                if (IsPointOnGrid(down) && enemyBoard.IsTestedSquare(down))
+                    addDown = false;
+
+                if (addDown && IsPointOnGrid(down))
                     possibleTilesAroundSeed.Add(down);
 
                 Point right = seed.Plus(new Point(dist, 0));
-                if (IsPointOnGrid(right))
+                if (IsPointOnGrid(right) && enemyBoard.IsTestedSquare(right))
+                    addRight = false;
+
+                if (addRight && IsPointOnGrid(right))
                     possibleTilesAroundSeed.Add(right);
 
                 Point up = seed.Plus(new Point(0, -dist));
-                if (IsPointOnGrid(up))
+                if (IsPointOnGrid(up) && enemyBoard.IsTestedSquare(up))
+                    addUp = false;
+
+                if (addUp && IsPointOnGrid(up))
                     possibleTilesAroundSeed.Add(up);
 
                 Point left = seed.Plus(new Point(-dist, 0));
-                if (IsPointOnGrid(left))
+                if (IsPointOnGrid(left) && enemyBoard.IsTestedSquare(left))
+                    addLeft = false;
+
+                if (addLeft && IsPointOnGrid(left))
                     possibleTilesAroundSeed.Add(left);
             }
         }

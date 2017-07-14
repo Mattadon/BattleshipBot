@@ -42,9 +42,9 @@ namespace BattleshipBot.Gameboards
             grid[gridX, gridY] = wasHit ? (char) GridResult.Hit : (char) GridResult.Miss;
         }
 
-        public bool IsTestedSquare(int x, int y)
+        public bool IsTestedSquare(Point point)
         {
-            return grid[x, y] != (char)GridResult.Unknown;
+            return grid[point.X, point.Y] != (char)GridResult.Unknown;
         }
 
         public override string ToString()

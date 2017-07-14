@@ -108,7 +108,7 @@ namespace BattleshipBot
 
             int firstColumnInRow = column;
 
-            while (enemyBoard.IsTestedSquare(column, row))
+            while (enemyBoard.IsTestedSquare(new Point(column, row)))
             {
                 column = (column + 2) % 10;
 
@@ -152,7 +152,7 @@ namespace BattleshipBot
             if (state == BotStates.Searching && wasHit)
             {
                 state = BotStates.Attacking;
-                previousShipAttacked = new EnemyShip(square);
+                previousShipAttacked = new EnemyShip(square, enemyBoard);
 
                 Console.WriteLine("FOUND A SHIP");
             }
