@@ -22,6 +22,8 @@ namespace BattleshipBot.Gameboards
     {
         private char[,] grid;
 
+        private List<int> activeEnemyShipSizes;
+
         public EnemyBoard()
         {
             grid = new char[10,10];
@@ -32,6 +34,8 @@ namespace BattleshipBot.Gameboards
                     grid[i, j] = (char)GridResult.Unknown;
                 }
             }
+
+            activeEnemyShipSizes = new List<int> {5, 4, 3, 3, 2};
         }
 
         public void UpdateBoard(IGridSquare square, bool wasHit)
@@ -63,6 +67,16 @@ namespace BattleshipBot.Gameboards
             }
 
             return gridString.ToString();
+        }
+
+        public int GetActiveShipMaxSize()
+        {
+            return activeEnemyShipSizes[0];
+        }
+
+        public void RemoveEnemyShip(int size)
+        {
+            activeEnemyShipSizes.Remove(size);
         }
     }
 }

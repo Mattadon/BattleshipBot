@@ -135,13 +135,16 @@ namespace BattleshipBot
 
         private IGridSquare AttackShip()
         {
-            if (previousShipAttacked.HasUnexploredPointsAroundSeed())
+            if (previousShipAttacked.IsNotDestroyed())
             {
                 return previousShipAttacked.GetNextTarget();
             }
             else
             {
                 state = BotStates.Searching;
+
+                enemyBoard.RemoveEnemyShip(previousShipAttacked.GetSizeOfDestroyedShip());
+                Console.WriteLine(previousShipAttacked.GetSizeOfDestroyedShip());
                 return PickRandomTarget();
             }
         }

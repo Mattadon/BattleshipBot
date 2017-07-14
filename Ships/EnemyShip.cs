@@ -10,7 +10,10 @@ namespace BattleshipBot.Ships
 {
     class EnemyShip
     {
-        private Point seed;
+        private readonly Point seed;
+
+        private readonly int maxSize;
+        private int sizeDetected;
 
         /*
          * Where x is the seed:
@@ -25,6 +28,9 @@ namespace BattleshipBot.Ships
 
         public EnemyShip(IGridSquare seedSquare, EnemyBoard enemyBoard)
         {
+            maxSize = enemyBoard.GetActiveShipMaxSize();
+            sizeDetected = 1;
+
             seed = Utils.ConvertGridSquareToPoint(seedSquare);
 
             bool addDown = true;
@@ -83,9 +89,17 @@ namespace BattleshipBot.Ships
             return square;
         }
 
-        public bool HasUnexploredPointsAroundSeed()
+        public int GetSizeOfDestroyedShip()
         {
-            return possibleTilesAroundSeed.Count > 0;
+            return sizeDetected;
+        }
+
+        public bool IsNotDestroyed()
+        {
+            bool hitLessThanMaxSize = sizeDetected < maxSize;
+            bool allOptionsNotExplored = possibleTilesAroundSeed.Count > 0;
+
+            return hitLessThanMaxSize && allOptionsNotExplored;
         }
 
         public void UpdateBasedOnShotResult(IGridSquare shot, bool wasHit)
@@ -99,6 +113,7 @@ namespace BattleshipBot.Ships
             else
             {
                 possibleTilesAroundSeed.RemoveAll(point => ShouldRemovePointsNoInShipDirection(point, shotPoint));
+                sizeDetected++;
             }
         }
 
